@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>TOTO_DNA v10.8 (Column & Color Fixed)</title>
+    <title>TOTO_DNA v10.9 (SMP & Popup Enhanced)</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
     <style>
         :root {
@@ -13,44 +13,53 @@
             --highlight: #9BC2E6;
         }
         body { font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; margin: 0; background: #f1f2f6; font-size: 12px; }
-        .top-bar { background: var(--bg-dark); color: white; padding: 10px 20px; display: flex; align-items: center; gap: 20px; position: sticky; top: 0; z-index: 100; }
-        .btn-load { background: #05c46b; color: white; border: none; padding: 8px 16px; font-weight: bold; cursor: pointer; border-radius: 4px; }
+        
+        /* 상단 바 */
+        .top-bar { background: var(--bg-dark); color: white; padding: 12px 20px; display: flex; align-items: center; gap: 20px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .btn-load { background: #05c46b; color: white; border: none; padding: 8px 18px; font-weight: bold; cursor: pointer; border-radius: 4px; }
+        .btn-load:hover { background: #04a85c; }
         .status { color: #f1c40f; font-weight: bold; }
         
-        .tabs { display: flex; background: #dfe4ea; border-bottom: 1px solid #ccc; }
-        .tab-btn { padding: 12px 20px; border: none; cursor: pointer; background: none; font-weight: bold; color: #57606f; }
+        /* 탭 시스템 */
+        .tabs { display: flex; background: #dfe4ea; border-bottom: 1px solid #ccc; padding: 0 10px; }
+        .tab-btn { padding: 12px 25px; border: none; cursor: pointer; background: none; font-weight: bold; color: #57606f; transition: 0.2s; }
         .tab-btn.active { background: white; border-bottom: 3px solid #05c46b; color: black; }
         .tab-content { display: none; padding: 10px; }
         .tab-content.active { display: block; }
 
-        table { width: 100%; border-collapse: collapse; background: white; table-layout: fixed; }
-        th, td { border: 1px solid #ced4da; padding: 6px 4px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        th { background: #f8f9fa; font-weight: bold; height: 30px; }
+        /* 테이블 공통 */
+        table { width: 100%; border-collapse: collapse; background: white; table-layout: fixed; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        th, td { border: 1px solid #ced4da; padding: 7px 5px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        th { background: #f8f9fa; font-weight: bold; color: #2c3e50; }
         
-        /* 컬럼별 너비 지정 */
         .col-time { width: 90px; }
-        .col-league { width: 80px; }
-        .col-match { width: 220px; }
+        .col-league { width: 100px; }
+        .col-match { width: 230px; }
         .col-odds { width: 150px; }
-        .col-handi { width: 50px; }
+        .col-handi { width: 55px; }
         .col-result { width: 250px; }
 
+        /* 패턴 및 결과 강조 */
         .pattern-fill { background-color: var(--highlight) !important; color: black !important; font-weight: bold; border: 1px solid #3498db; }
-        .smp-mark { background: #3F14F8 !important; color: white !important; }
+        .smp-mark { background: #3F14F8 !important; color: white !important; font-weight: bold; }
         .win { color: var(--win-blue); font-weight: bold; }
         .draw { color: var(--draw-green); font-weight: bold; }
         .loss { color: var(--loss-red); font-weight: bold; }
-        .strong { background: #eb4d4b; color: white; font-weight: bold; padding: 2px 4px; border-radius: 3px; }
-        .sub-text { color: #0abde3; font-size: 11px; font-weight: bold; margin-left: 4px; }
+        
+        /* 분석결과 빨간 라인 제거 및 텍스트 강조만 유지 */
+        .res-text { font-weight: bold; }
+        .strong-text { font-size: 13px; text-decoration: underline; } 
+        
+        .sub-text { color: #0abde3; font-size: 11px; font-weight: bold; margin-left: 5px; }
 
-        tr:hover { background-color: #f1f2f6; cursor: pointer; }
+        tr:hover { background-color: #f8f9fa; cursor: pointer; }
 
-        /* 모달 */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.75); z-index: 1000; }
-        .modal-box { background: white; width: 600px; margin: 50px auto; border-radius: 8px; overflow: hidden; }
-        .modal-header { background: #2f3640; color: white; padding: 12px 20px; font-weight: bold; display: flex; justify-content: space-between; }
-        .modal-body { padding: 20px; font-family: 'Consolas', monospace; white-space: pre-wrap; line-height: 1.6; max-height: 500px; overflow-y: auto; }
-        .close-btn { cursor: pointer; }
+        /* 모달 팝업 */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; }
+        .modal-box { background: #fdfdfd; width: 620px; margin: 60px auto; border-radius: 10px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .modal-header { background: #2f3640; color: white; padding: 15px 20px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
+        .modal-body { padding: 25px; font-family: 'Consolas', 'Nanum Gothic Coding', monospace; white-space: pre-wrap; line-height: 1.8; color: #2f3640; }
+        .close-btn { cursor: pointer; font-size: 20px; }
     </style>
 </head>
 <body>
@@ -58,13 +67,13 @@
     <div class="top-bar">
         <input type="file" id="fileInput" style="display:none" />
         <button class="btn-load" onclick="document.getElementById('fileInput').click()">1. 데이터 정밀 분석 시작</button>
-        <span class="status" id="statusLbl">파일을 선택해주세요.</span>
+        <span class="status" id="statusLbl">파일을 선택해주세요. (v10.9)</span>
     </div>
 
     <div class="tabs">
         <button class="tab-btn active" onclick="tabCtrl(event, 'tab1')">일반 경기</button>
         <button class="tab-btn" onclick="tabCtrl(event, 'tab2')">승무패 경기</button>
-        <button class="tab-btn" onclick="tabCtrl(event, 'tab3')">시나리오 통계</button>
+        <button class="tab-btn" onclick="tabCtrl(event, 'tab3')">패턴 통계 검증</button>
     </div>
 
     <div id="tab1" class="tab-content active">
@@ -73,7 +82,7 @@
                 <tr>
                     <th class="col-time">시간</th><th class="col-league">리그</th><th class="col-match">매치업</th>
                     <th class="col-odds">일반배당</th><th class="col-handi">H</th><th class="col-odds">핸디배당</th>
-                    <th class="col-result">분석 결과 (v10.8)</th>
+                    <th class="col-result">분석 결과</th>
                 </tr>
             </thead>
             <tbody></tbody>
@@ -86,7 +95,7 @@
                 <tr>
                     <th class="col-time">시간</th><th class="col-league">리그</th><th class="col-match">매치업</th>
                     <th class="col-odds">일반배당</th><th class="col-handi">H</th><th class="col-odds">핸디배당</th>
-                    <th class="col-result">분석 결과</th>
+                    <th class="col-result">승무패 분석결과</th>
                 </tr>
             </thead>
             <tbody></tbody>
@@ -97,7 +106,7 @@
         <table id="statTable">
             <thead>
                 <tr>
-                    <th>리그</th><th>패턴 조합</th><th>추천</th><th>성공/전체</th><th>적중률</th><th>과거 결과</th>
+                    <th>리그</th><th>패턴 조합</th><th>추천</th><th>성공/전체</th><th>적중률</th><th>최근 5경기 사례</th>
                 </tr>
             </thead>
             <tbody></tbody>
@@ -107,10 +116,13 @@
     <div id="modal" class="modal" onclick="closeModal()">
         <div class="modal-box" onclick="event.stopPropagation()">
             <div class="modal-header">
-                <span>🔍 정밀 분석 리포트</span>
+                <span>🔍 v10.9 정밀 분석 리포트</span>
                 <span class="close-btn" onclick="closeModal()">&times;</span>
             </div>
             <div id="modalBody" class="modal-body"></div>
+            <div style="text-align: center; padding-bottom: 20px;">
+                <button onclick="closeModal()" style="padding: 8px 40px; cursor:pointer;">닫기</button>
+            </div>
         </div>
     </div>
 
@@ -139,20 +151,19 @@
             reader.readAsArrayBuffer(file);
         });
 
-        // 색상 추출 로직 보정 (Theme, Indexed, ARGB 모두 대응)
         function getHexColor(cell) {
             if (!cell || !cell.fill || !cell.fill.fgColor) return "NO_FILL";
             const fg = cell.fill.fgColor;
-            if (fg.argb) return fg.argb; // 표준 ARGB
-            if (fg.theme !== undefined) return `THEME_${fg.theme}_${fg.tint || 0}`; // 테마색
-            if (fg.indexed !== undefined) return `INDEX_${fg.indexed}`; // 인덱스색
+            if (fg.argb) return fg.argb;
+            if (fg.theme !== undefined) return `THEME_${fg.theme}_${fg.tint || 0}`;
+            if (fg.indexed !== undefined) return `INDEX_${fg.indexed}`;
             return "NO_FILL";
         }
 
         function parseExcel(ws) {
-            // 1. 기본 배경색 학습 (학습 구간 2행~100행)
+            // 기본 배경색 학습 보정
             let colors = {};
-            for(let i=2; i<=Math.min(ws.rowCount, 100); i++){
+            for(let i=2; i<=Math.min(ws.rowCount, 150); i++){
                 const row = ws.getRow(i);
                 [8, 9, 10, 16, 17, 18].forEach(c => {
                     const clr = getHexColor(row.getCell(c));
@@ -161,13 +172,10 @@
             }
             baseColor = Object.keys(colors).reduce((a, b) => colors[a] > colors[b] ? a : b, "NO_FILL");
 
-            // 2. 데이터 추출 (1-Based Index 정밀 매칭)
-            // Python row[1] -> Excel Col B(2)
-            // Python row[7,8,9] -> Excel Col H(8), I(9), J(10)
             const all = [];
             ws.eachRow((row, i) => {
                 if(i < 2) return;
-                const home = row.getCell(4).value; // D열(4)
+                const home = row.getCell(4).value;
                 if(!home) return;
 
                 const getOdds = (cols, labels) => {
@@ -183,21 +191,25 @@
                     return {odds, pats: pats.join("")};
                 };
 
-                const g = getOdds([8, 9, 10], ["승", "무", "패"]); // H, I, J
-                const h = getOdds([16, 17, 18], ["승", "무", "패"]); // P, Q, R
-                const lClr = getHexColor(row.getCell(3)); // C열(3) 리그 색상
+                const g = getOdds([8, 9, 10], ["승", "무", "패"]);
+                const h = getOdds([16, 17, 18], ["승", "무", "패"]);
+                
+                // 승무패 인식 로직 (리그 컬럼 배경색 확인)
+                const leagueCell = row.getCell(3);
+                const lClr = getHexColor(leagueCell);
+                const isSmp = (lClr !== "NO_FILL" && lClr !== baseColor);
 
                 all.push({
-                    time: String(row.getCell(2).value || "").substring(5, 16), // B(2)
-                    league: String(row.getCell(3).value || "").trim(), // C(3)
+                    time: String(row.getCell(2).value || "").substring(5, 16),
+                    league: String(row.getCell(3).value || "").trim(),
                     home: String(home).trim(),
-                    away: String(row.getCell(6).value || "").trim(), // F(6)
-                    handi: row.getCell(15).value || "", // O(15)
+                    away: String(row.getCell(6).value || "").trim(),
+                    handi: row.getCell(15).value || "",
                     g_odds: g.odds, g_pat: g.pats,
                     h_odds: h.odds, h_pat: h.pats,
-                    is_smp: (lClr !== "NO_FILL" && lClr !== baseColor),
-                    res_g: clean(row.getCell(11).value), // K(11)
-                    res_h: clean(row.getCell(19).value)  // S(19)
+                    is_smp: isSmp,
+                    res_g: clean(row.getCell(11).value),
+                    res_h: clean(row.getCell(19).value)
                 });
             });
 
@@ -219,7 +231,6 @@
             return "None";
         }
 
-        // --- 분석 엔진 ---
         function buildCache(past) {
             cL1 = {}; cL2 = {}; cL3 = {}; tHist = {}; h2hHist = {};
             past.forEach(r => {
@@ -255,9 +266,8 @@
                     }
                 }
             });
-            if(Object.keys(s).length === 0) return {txt: "데이터 부족", best:"", prob:0};
+            if(Object.keys(s).length === 0) return {txt: "사례부족", best:"", prob:0};
 
-            // 기세 반영
             const hM = getMom(r.home).s, aM = getMom(r.away).s;
             if(hM - aM >= 3 && s["일반[승]"]) s["일반[승]"] *= 1.2;
             if(aM - hM >= 3 && s["일반[패]"]) s["일반[패]"] *= 1.2;
@@ -289,7 +299,6 @@
             });
         }
 
-        // --- 렌더링 ---
         function render() {
             const b1 = document.querySelector("#mainTable tbody"), b2 = document.querySelector("#smpTable tbody"), b3 = document.querySelector("#statTable tbody");
             b1.innerHTML = ""; b2.innerHTML = ""; b3.innerHTML = "";
@@ -302,6 +311,9 @@
                 const oddsHtml = (odds) => odds.map(o => `<span class="${o.p?'pattern-fill':''}">${o.v}</span>`).join(" ");
                 const resClass = p.best.includes("승")?"win":(p.best.includes("무")?"draw":"loss");
                 
+                // [수정] 빨간색 라인 제거, 강조 텍스트만 표시
+                const resDisplay = `<span class="res-text ${resClass} ${p.pref==='[강력]'?'strong-text':''}">${p.txt}</span>`;
+                
                 tr.innerHTML = `
                     <td>${r.time}</td>
                     <td class="${r.is_smp?'smp-mark':''}">${r.league}</td>
@@ -309,7 +321,7 @@
                     <td>${oddsHtml(r.g_odds)}</td>
                     <td style="color:#999">${r.handi}</td>
                     <td>${oddsHtml(r.h_odds)}</td>
-                    <td class="${resClass} ${p.pref==='[강력]'?'strong':''}">${p.txt}</td>
+                    <td>${resDisplay}</td>
                 `;
                 b1.appendChild(tr);
                 if(r.is_smp) b2.appendChild(tr.cloneNode(true));
@@ -319,7 +331,7 @@
                 const [l, gp, hp] = k.split("_");
                 const acc = ((d.hits/d.total)*100).toFixed(1);
                 const tr = document.createElement("tr");
-                tr.innerHTML = `<td>${l}</td><td>G:${gp}/H:${hp}</td><td>${d.best}</td><td>${d.hits}/${d.total}</td><td style="color:red;font-weight:bold">${acc}%</td><td>${d.res.join(", ")}</td>`;
+                tr.innerHTML = `<td>${l}</td><td>G:${gp}/H:${hp}</td><td>${d.best}</td><td>${d.hits}/${d.total}</td><td style="color:red;font-weight:bold">${acc}%</td><td>${d.res.join(" | ")}</td>`;
                 b3.appendChild(tr);
             });
         }
@@ -328,17 +340,23 @@
             const hM = getMom(r.home), aM = getMom(r.away);
             const h2h = (h2hHist[[r.home,r.away].sort().join("|")] || []).slice(-5).map(m => m.h===r.home?m.r:(m.r==='승'?'패':(m.r==='패'?'승':'무')));
 
-            let c = `[${r.league}] ${r.home} vs ${r.away}\n`;
-            c += `패턴: 일반(${r.g_pat || '없음'}) / 핸디(${r.h_pat || '없음'}) / H:${r.handi}\n`;
-            c += `--------------------------------------------------\n`;
-            c += `▶ 홈팀 최근: ${hM.h.join("-") || '기록없음'} (기세 ${hM.s})\n`;
-            c += `▶ 원정 최근: ${aM.h.join("-") || '기록없음'} (기세 ${aM.s})\n`;
-            c += `▶ 상대 전적: ${h2h.join("-") || '기록없음'} (홈기준)\n`;
-            c += `--------------------------------------------------\n`;
-            c += `▶ 분석 결과: ${p.txt}\n`;
+            let c = `● 경기 : [${r.league}] ${r.home} vs ${r.away}\n`;
+            c += `● 패턴 : 일반(${r.g_pat || '없음'}) / 핸디(${r.h_pat || '없음'}) / 핸디캡:${r.handi}\n`;
+            c += `----------------------------------------------------------\n`;
+            c += `▶ 홈 팀 최근 : ${hM.h.join("-") || '기록없음'} (기세 ${hM.s}점)\n`;
+            c += `▶ 원정팀 최근 : ${aM.h.join("-") || '기록없음'} (기세 ${aM.s}점)\n`;
+            c += `▶ 상대 전적  : ${h2h.join("-") || '기록없음'} (홈팀기준)\n`;
+            c += `----------------------------------------------------------\n`;
+            c += `▶ 종합 분석  : ${p.txt}\n`;
             
+            // [추가] 팝업에서 최근 5경기 패턴 표시
             const st = scStats[`${r.league}_${r.g_pat}_${r.h_pat}`];
-            if(st) c += `▶ 통계 적중률: ${((st.hits/st.total)*100).toFixed(1)}% (${st.hits}/${st.total}회)`;
+            if(st) {
+                c += `▶ 패턴 적중률: ${((st.hits/st.total)*100).toFixed(1)}% (${st.hits}/${st.total}회 성공)\n`;
+                c += `▶ 최근 패턴 결과 (일반/핸디):\n   [ ${st.res.join(" ], [ ")} ]`;
+            } else {
+                c += `▶ 패턴 통계: 과거 동일 사례 데이터가 부족합니다.`;
+            }
 
             document.getElementById('modalBody').innerText = c;
             document.getElementById('modal').style.display = 'block';
