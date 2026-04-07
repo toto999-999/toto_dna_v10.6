@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>TOTO_DNA v10.9 (SMP & Popup Enhanced)</title>
+    <title>TOTO_DNA v10.10 (Interaction Focused)</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
     <style>
         :root {
@@ -11,55 +11,47 @@
             --loss-red: #d63031;
             --draw-green: #00b894;
             --highlight: #9BC2E6;
+            --focus-yellow: #fff200;
         }
         body { font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; margin: 0; background: #f1f2f6; font-size: 12px; }
         
-        /* 상단 바 */
         .top-bar { background: var(--bg-dark); color: white; padding: 12px 20px; display: flex; align-items: center; gap: 20px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         .btn-load { background: #05c46b; color: white; border: none; padding: 8px 18px; font-weight: bold; cursor: pointer; border-radius: 4px; }
-        .btn-load:hover { background: #04a85c; }
         .status { color: #f1c40f; font-weight: bold; }
         
-        /* 탭 시스템 */
-        .tabs { display: flex; background: #dfe4ea; border-bottom: 1px solid #ccc; padding: 0 10px; }
-        .tab-btn { padding: 12px 25px; border: none; cursor: pointer; background: none; font-weight: bold; color: #57606f; transition: 0.2s; }
+        .tabs { display: flex; background: #dfe4ea; border-bottom: 1px solid #ccc; padding: 0 10px; position: sticky; top: 48px; z-index: 90; }
+        .tab-btn { padding: 12px 25px; border: none; cursor: pointer; background: none; font-weight: bold; color: #57606f; }
         .tab-btn.active { background: white; border-bottom: 3px solid #05c46b; color: black; }
         .tab-content { display: none; padding: 10px; }
         .tab-content.active { display: block; }
 
-        /* 테이블 공통 */
-        table { width: 100%; border-collapse: collapse; background: white; table-layout: fixed; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; background: white; table-layout: fixed; }
         th, td { border: 1px solid #ced4da; padding: 7px 5px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        th { background: #f8f9fa; font-weight: bold; color: #2c3e50; }
+        th { background: #f8f9fa; font-weight: bold; position: sticky; top: 0; z-index: 10; }
         
-        .col-time { width: 90px; }
-        .col-league { width: 100px; }
-        .col-match { width: 230px; }
-        .col-odds { width: 150px; }
-        .col-handi { width: 55px; }
-        .col-result { width: 250px; }
+        /* 컬럼 너비 */
+        .col-time { width: 85px; } .col-league { width: 100px; } .col-match { width: 230px; } .col-odds { width: 150px; } .col-handi { width: 50px; } .col-result { width: 250px; }
 
-        /* 패턴 및 결과 강조 */
-        .pattern-fill { background-color: var(--highlight) !important; color: black !important; font-weight: bold; border: 1px solid #3498db; }
+        /* 강조 스타일 */
+        .pattern-fill { background-color: var(--highlight) !important; color: black !important; font-weight: bold; border-radius: 2px; }
         .smp-mark { background: #3F14F8 !important; color: white !important; font-weight: bold; }
         .win { color: var(--win-blue); font-weight: bold; }
         .draw { color: var(--draw-green); font-weight: bold; }
         .loss { color: var(--loss-red); font-weight: bold; }
-        
-        /* 분석결과 빨간 라인 제거 및 텍스트 강조만 유지 */
         .res-text { font-weight: bold; }
-        .strong-text { font-size: 13px; text-decoration: underline; } 
+        .strong-text { font-size: 13px; text-decoration: underline; }
         
-        .sub-text { color: #0abde3; font-size: 11px; font-weight: bold; margin-left: 5px; }
+        /* 상호작용 하이라이트 애니메이션 */
+        .find-focus { background-color: var(--focus-yellow) !important; transition: background-color 0.5s ease; }
 
         tr:hover { background-color: #f8f9fa; cursor: pointer; }
 
         /* 모달 팝업 */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; }
-        .modal-box { background: #fdfdfd; width: 620px; margin: 60px auto; border-radius: 10px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .modal-header { background: #2f3640; color: white; padding: 15px 20px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
-        .modal-body { padding: 25px; font-family: 'Consolas', 'Nanum Gothic Coding', monospace; white-space: pre-wrap; line-height: 1.8; color: #2f3640; }
-        .close-btn { cursor: pointer; font-size: 20px; }
+        .modal-box { background: #fdfdfd; width: 620px; margin: 60px auto; border-radius: 10px; overflow: hidden; }
+        .modal-header { background: #2f3640; color: white; padding: 15px 20px; font-weight: bold; display: flex; justify-content: space-between; }
+        .modal-body { padding: 25px; font-family: 'Consolas', monospace; white-space: pre-wrap; line-height: 1.8; color: #2f3640; }
+        .close-btn { cursor: pointer; }
     </style>
 </head>
 <body>
@@ -67,13 +59,13 @@
     <div class="top-bar">
         <input type="file" id="fileInput" style="display:none" />
         <button class="btn-load" onclick="document.getElementById('fileInput').click()">1. 데이터 정밀 분석 시작</button>
-        <span class="status" id="statusLbl">파일을 선택해주세요. (v10.9)</span>
+        <span class="status" id="statusLbl">파일을 선택해주세요. (v10.10)</span>
     </div>
 
     <div class="tabs">
-        <button class="tab-btn active" onclick="tabCtrl(event, 'tab1')">일반 경기</button>
-        <button class="tab-btn" onclick="tabCtrl(event, 'tab2')">승무패 경기</button>
-        <button class="tab-btn" onclick="tabCtrl(event, 'tab3')">패턴 통계 검증</button>
+        <button class="tab-btn active" id="btnTab1" onclick="tabCtrl(event, 'tab1')">일반 경기</button>
+        <button class="tab-btn" id="btnTab2" onclick="tabCtrl(event, 'tab2')">승무패 경기</button>
+        <button class="tab-btn" id="btnTab3" onclick="tabCtrl(event, 'tab3')">패턴 통계 검증</button>
     </div>
 
     <div id="tab1" class="tab-content active">
@@ -95,7 +87,7 @@
                 <tr>
                     <th class="col-time">시간</th><th class="col-league">리그</th><th class="col-match">매치업</th>
                     <th class="col-odds">일반배당</th><th class="col-handi">H</th><th class="col-odds">핸디배당</th>
-                    <th class="col-result">승무패 분석결과</th>
+                    <th class="col-result">승무패 분석</th>
                 </tr>
             </thead>
             <tbody></tbody>
@@ -106,7 +98,8 @@
         <table id="statTable">
             <thead>
                 <tr>
-                    <th>리그</th><th>패턴 조합</th><th>추천</th><th>성공/전체</th><th>적중률</th><th>최근 5경기 사례</th>
+                    <th style="width:100px;">리그</th><th style="width:150px;">패턴 조합</th><th style="width:100px;">추천</th>
+                    <th style="width:80px;">성공/전체</th><th style="width:80px;">적중률</th><th>최근 5경기 사례</th>
                 </tr>
             </thead>
             <tbody></tbody>
@@ -116,12 +109,12 @@
     <div id="modal" class="modal" onclick="closeModal()">
         <div class="modal-box" onclick="event.stopPropagation()">
             <div class="modal-header">
-                <span>🔍 v10.9 정밀 분석 리포트</span>
+                <span>🔍 v10.10 정밀 분석 리포트</span>
                 <span class="close-btn" onclick="closeModal()">&times;</span>
             </div>
             <div id="modalBody" class="modal-body"></div>
             <div style="text-align: center; padding-bottom: 20px;">
-                <button onclick="closeModal()" style="padding: 8px 40px; cursor:pointer;">닫기</button>
+                <button onclick="closeModal()" style="padding: 8px 40px; cursor:pointer;">확인 및 닫기</button>
             </div>
         </div>
     </div>
@@ -137,11 +130,9 @@
         document.getElementById('fileInput').addEventListener('change', async (e) => {
             const file = e.target.files[0];
             if (!file) return;
-
-            document.getElementById('statusLbl').innerText = "엑셀 로딩 및 분석 중...";
+            document.getElementById('statusLbl').innerText = "분석 엔진 가동 중...";
             const wb = new ExcelJS.Workbook();
             const reader = new FileReader();
-            
             reader.onload = async (f) => {
                 await wb.xlsx.load(f.target.result);
                 const ws = wb.getWorksheet('일반핸디');
@@ -151,19 +142,22 @@
             reader.readAsArrayBuffer(file);
         });
 
+        function getScenId(league, gPat, hPat) {
+            // 패턴 조합별 유니크 ID 생성
+            return btoa(unescape(encodeURIComponent(`${league}_${gPat}_${hPat}`))).replace(/=/g, "");
+        }
+
         function getHexColor(cell) {
             if (!cell || !cell.fill || !cell.fill.fgColor) return "NO_FILL";
             const fg = cell.fill.fgColor;
             if (fg.argb) return fg.argb;
             if (fg.theme !== undefined) return `THEME_${fg.theme}_${fg.tint || 0}`;
-            if (fg.indexed !== undefined) return `INDEX_${fg.indexed}`;
             return "NO_FILL";
         }
 
         function parseExcel(ws) {
-            // 기본 배경색 학습 보정
             let colors = {};
-            for(let i=2; i<=Math.min(ws.rowCount, 150); i++){
+            for(let i=2; i<=Math.min(ws.rowCount, 100); i++){
                 const row = ws.getRow(i);
                 [8, 9, 10, 16, 17, 18].forEach(c => {
                     const clr = getHexColor(row.getCell(c));
@@ -193,11 +187,7 @@
 
                 const g = getOdds([8, 9, 10], ["승", "무", "패"]);
                 const h = getOdds([16, 17, 18], ["승", "무", "패"]);
-                
-                // 승무패 인식 로직 (리그 컬럼 배경색 확인)
-                const leagueCell = row.getCell(3);
-                const lClr = getHexColor(leagueCell);
-                const isSmp = (lClr !== "NO_FILL" && lClr !== baseColor);
+                const isSmp = (getHexColor(row.getCell(3)) !== "NO_FILL" && getHexColor(row.getCell(3)) !== baseColor);
 
                 all.push({
                     time: String(row.getCell(2).value || "").substring(5, 16),
@@ -219,7 +209,7 @@
             buildCache(past);
             calcStats(past);
             render();
-            document.getElementById('statusLbl').innerText = `분석 완료 (과거:${past.length} / 예정:${upData.length})`;
+            document.getElementById('statusLbl').innerText = `분석완료 (과거:${past.length} / 예정:${upData.length})`;
         }
 
         function clean(v) {
@@ -251,11 +241,7 @@
         function getPred(r) {
             if(!r.g_pat && !r.h_pat) return {txt: "패턴없음", best:"", prob:0};
             let s = {}, totalW = 0;
-            const lvls = [
-                {d:cL1, w:10, k:`${r.league}_${r.handi}_${r.g_pat}`},
-                {d:cL2, w:5, k:`${r.league}_${r.g_pat}`},
-                {d:cL3, w:2, k:`${r.g_pat}_${r.h_pat}`}
-            ];
+            const lvls = [{d:cL1, w:10, k:`${r.league}_${r.handi}_${r.g_pat}`}, {d:cL2, w:5, k:`${r.league}_${r.g_pat}`}, {d:cL3, w:2, k:`${r.g_pat}_${r.h_pat}`}];
             lvls.forEach(l => {
                 if(l.d[l.k]) {
                     for(let rk in l.d[l.k]){
@@ -267,16 +253,13 @@
                 }
             });
             if(Object.keys(s).length === 0) return {txt: "사례부족", best:"", prob:0};
-
             const hM = getMom(r.home).s, aM = getMom(r.away).s;
             if(hM - aM >= 3 && s["일반[승]"]) s["일반[승]"] *= 1.2;
             if(aM - hM >= 3 && s["일반[패]"]) s["일반[패]"] *= 1.2;
-
             const sorted = Object.entries(s).sort((a,b)=>b[1]-a[1]);
             const [best, val] = sorted[0];
             const prob = ((val / Object.values(s).reduce((a,b)=>a+b)) * 100).toFixed(1);
-            const pref = totalW > 40 ? "[강력]" : (totalW < 10 ? "[참고]" : "[일반]");
-            return {txt: `${pref} ${best} (${prob}%)`, best, prob, pref};
+            return {txt: `${totalW > 40 ? '[강력] ' : ''}${best} (${prob}%)`, best, prob, isStrong: totalW > 40};
         }
 
         function getMom(t) {
@@ -290,13 +273,40 @@
             past.forEach(r => {
                 const p = getPred(r);
                 if(p.best){
-                    const k = `${r.league}_${r.g_pat}_${r.h_pat}`;
-                    if(!scStats[k]) scStats[k] = {hits:0, total:0, res:[], best:p.best, prob:p.prob};
+                    const k = getScenId(r.league, r.g_pat, r.h_pat);
+                    if(!scStats[k]) scStats[k] = {league: r.league, gp: r.g_pat, hp: r.h_pat, hits:0, total:0, res:[], best:p.best, prob:p.prob};
                     if(p.best.includes(r.res_g) || p.best.includes(r.res_h)) scStats[k].hits++;
                     scStats[k].total++;
                     if(scStats[k].res.length < 5) scStats[k].res.push(`${r.res_g}/${r.res_h}`);
                 }
             });
+        }
+
+        // --- 상호작용 함수 ---
+        function focusScenario(scenId) {
+            tabCtrl(null, 'tab3', document.getElementById('btnTab3'));
+            setTimeout(() => {
+                const target = document.getElementById(`scen_${scenId}`);
+                if(target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    target.classList.add('find-focus');
+                    setTimeout(() => target.classList.remove('find-focus'), 2000);
+                }
+            }, 100);
+        }
+
+        function focusMatches(scenId) {
+            tabCtrl(null, 'tab1', document.getElementById('btnTab1'));
+            setTimeout(() => {
+                const targets = document.querySelectorAll(`.match-row-${scenId}`);
+                if(targets.length > 0) {
+                    targets[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    targets.forEach(t => {
+                        t.classList.add('find-focus');
+                        setTimeout(() => t.classList.remove('find-focus'), 2000);
+                    });
+                }
+            }, 100);
         }
 
         function render() {
@@ -305,33 +315,41 @@
 
             upData.forEach(r => {
                 const p = getPred(r);
+                const scenId = getScenId(r.league, r.g_pat, r.h_pat);
                 const tr = document.createElement("tr");
-                tr.onclick = () => showDetail(r, p);
+                tr.className = `match-row-${scenId}`;
+                tr.onclick = () => { showDetail(r, p); focusScenario(scenId); };
 
                 const oddsHtml = (odds) => odds.map(o => `<span class="${o.p?'pattern-fill':''}">${o.v}</span>`).join(" ");
                 const resClass = p.best.includes("승")?"win":(p.best.includes("무")?"draw":"loss");
                 
-                // [수정] 빨간색 라인 제거, 강조 텍스트만 표시
-                const resDisplay = `<span class="res-text ${resClass} ${p.pref==='[강력]'?'strong-text':''}">${p.txt}</span>`;
-                
-                tr.innerHTML = `
+                const html = `
                     <td>${r.time}</td>
                     <td class="${r.is_smp?'smp-mark':''}">${r.league}</td>
                     <td style="text-align:left;"><b>${r.home}</b> vs ${r.away}</td>
                     <td>${oddsHtml(r.g_odds)}</td>
                     <td style="color:#999">${r.handi}</td>
                     <td>${oddsHtml(r.h_odds)}</td>
-                    <td>${resDisplay}</td>
+                    <td><span class="res-text ${resClass} ${p.isStrong?'strong-text':''}">${p.txt}</span></td>
                 `;
+                tr.innerHTML = html;
                 b1.appendChild(tr);
                 if(r.is_smp) b2.appendChild(tr.cloneNode(true));
             });
 
-            Object.entries(scStats).sort((a,b)=>(b[1].hits/b[1].total)-(a[1].hits/a[1].total)).forEach(([k,d])=>{
-                const [l, gp, hp] = k.split("_");
+            Object.entries(scStats).sort((a,b)=>(b[1].hits/b[1].total)-(a[1].hits/a[1].total)).forEach(([sid, d])=>{
                 const acc = ((d.hits/d.total)*100).toFixed(1);
                 const tr = document.createElement("tr");
-                tr.innerHTML = `<td>${l}</td><td>G:${gp}/H:${hp}</td><td>${d.best}</td><td>${d.hits}/${d.total}</td><td style="color:red;font-weight:bold">${acc}%</td><td>${d.res.join(" | ")}</td>`;
+                tr.id = `scen_${sid}`;
+                tr.onclick = () => focusMatches(sid);
+                tr.innerHTML = `
+                    <td>${d.league}</td>
+                    <td style="color:#666">G:${d.gp || '-'} / H:${d.hp || '-'}</td>
+                    <td class="${d.best.includes('승')?'win':(d.best.includes('무')?'draw':'loss')}">${d.best}</td>
+                    <td>${d.hits}/${d.total}</td>
+                    <td style="color:red;font-weight:bold">${acc}%</td>
+                    <td style="font-size:11px; color:#555;">${d.res.join(" | ")}</td>
+                `;
                 b3.appendChild(tr);
             });
         }
@@ -339,6 +357,8 @@
         function showDetail(r, p) {
             const hM = getMom(r.home), aM = getMom(r.away);
             const h2h = (h2hHist[[r.home,r.away].sort().join("|")] || []).slice(-5).map(m => m.h===r.home?m.r:(m.r==='승'?'패':(m.r==='패'?'승':'무')));
+            const scenId = getScenId(r.league, r.g_pat, r.h_pat);
+            const st = scStats[scenId];
 
             let c = `● 경기 : [${r.league}] ${r.home} vs ${r.away}\n`;
             c += `● 패턴 : 일반(${r.g_pat || '없음'}) / 핸디(${r.h_pat || '없음'}) / 핸디캡:${r.handi}\n`;
@@ -348,25 +368,20 @@
             c += `▶ 상대 전적  : ${h2h.join("-") || '기록없음'} (홈팀기준)\n`;
             c += `----------------------------------------------------------\n`;
             c += `▶ 종합 분석  : ${p.txt}\n`;
-            
-            // [추가] 팝업에서 최근 5경기 패턴 표시
-            const st = scStats[`${r.league}_${r.g_pat}_${r.h_pat}`];
             if(st) {
                 c += `▶ 패턴 적중률: ${((st.hits/st.total)*100).toFixed(1)}% (${st.hits}/${st.total}회 성공)\n`;
                 c += `▶ 최근 패턴 결과 (일반/핸디):\n   [ ${st.res.join(" ], [ ")} ]`;
-            } else {
-                c += `▶ 패턴 통계: 과거 동일 사례 데이터가 부족합니다.`;
             }
-
             document.getElementById('modalBody').innerText = c;
             document.getElementById('modal').style.display = 'block';
         }
 
-        function tabCtrl(e, id) {
+        function tabCtrl(e, id, btn) {
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.getElementById(id).classList.add('active');
-            e.currentTarget.classList.add('active');
+            if(btn) btn.classList.add('active');
+            else if(e) e.currentTarget.classList.add('active');
         }
         function closeModal() { document.getElementById('modal').style.display = 'none'; }
     </script>
