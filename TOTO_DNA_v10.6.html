@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>TOTO_DNA v10.12</title>
+    <title>TOTO_DNA v10.6</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
     <style>
         :root {
@@ -74,7 +74,7 @@
     <!-- 보안 로그인 -->
     <div id="login-screen">
         <h2 style="margin:0;">TOTO_DNA v10.12 ACCESS</h2>
-        <input type="password" id="pwField" class="pw-input" maxlength="4" placeholder="비밀번호 4자리">
+        <input type="password" id="pwField" class="pw-input" maxlength="4" placeholder="비밀번호">
         <button onclick="checkPw()" style="margin-top:20px; padding: 10px 40px; cursor:pointer; font-weight:bold;">접속</button>
     </div>
 
@@ -82,7 +82,7 @@
     <div id="main-ui" style="display:none;">
         <div class="top-bar">
             <input type="file" id="fileInput" style="display:none" />
-            <button class="btn-load" onclick="document.getElementById('fileInput').click()">1. 엑셀 불러오기</button>
+            <button class="btn-load" onclick="document.getElementById('fileInput').click()">1. 데이터 불러오기</button>
             <button class="btn-reset" onclick="clearFocus()">🔍 하이라이트 초기화</button>
             <span class="status" id="statusLbl">분석 대기 중...</span>
         </div>
@@ -136,7 +136,7 @@
     <div id="modal" class="modal" onclick="closeModal()">
         <div class="modal-box" onclick="event.stopPropagation()">
             <div class="modal-header">
-                <span>🔍 v10.12 정밀 리포트</span>
+                <span>🔍 v10.6 정밀 리포트</span>
                 <span class="close-btn" onclick="closeModal()">&times;</span>
             </div>
             <div id="modalBody" class="modal-body"></div>
