@@ -2,10 +2,9 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TOTO_DNA v10.7 Web</title>
-    <!-- 엑셀 파싱을 위한 SheetJS 라이브러리 -->
-    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+    <title>TOTO_DNA v10.7 (Color Detection Fixed)</title>
+    <!-- 셀 색상 분석을 위한 ExcelJS 라이브러리 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
     <style>
         :root {
             --bg-color: #1e272e;
@@ -13,53 +12,54 @@
             --win-color: #0984e3;
             --draw-color: #00b894;
             --loss-color: #d63031;
-            --highlight-bg: #9BC2E6;
+            --highlight-bg: #9BC2E6; /* 배당 패턴 색상 */
             --strong-bg: #eb4d4b;
         }
 
-        body { font-family: '맑은 고딕', sans-serif; margin: 0; background-color: #f5f6fa; font-size: 13px; }
+        body { font-family: '맑은 고딕', sans-serif; margin: 0; background-color: #f5f6fa; font-size: 13px; overflow-y: scroll; }
         
-        /* 상단 바 */
-        .top-frame { background: var(--bg-color); color: white; padding: 10px; display: flex; align-items: center; gap: 15px; position: sticky; top: 0; z-index: 100; }
-        .btn-load { background: #05c46b; color: white; border: none; padding: 8px 15px; font-weight: bold; cursor: pointer; border-radius: 4px; }
-        .lbl-debug { color: #f1c40f; }
+        .top-frame { background: var(--bg-color); color: white; padding: 12px; display: flex; align-items: center; gap: 15px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+        .btn-load { background: #05c46b; color: white; border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; border-radius: 4px; transition: 0.2s; }
+        .btn-load:hover { background: #049f57; }
+        .lbl-debug { color: #f1c40f; font-weight: bold; }
 
-        /* 탭 메뉴 */
-        .tabs { display: flex; background: #eee; border-bottom: 1px solid #ccc; }
-        .tab-btn { padding: 10px 20px; border: none; cursor: pointer; background: #eee; font-weight: bold; }
-        .tab-btn.active { background: white; border-bottom: 2px solid #05c46b; }
-        .tab-content { display: none; padding: 10px; overflow-x: auto; }
+        .tabs { display: flex; background: #eee; border-bottom: 1px solid #ccc; padding: 0 10px; }
+        .tab-btn { padding: 12px 25px; border: none; cursor: pointer; background: #eee; font-weight: bold; color: #666; }
+        .tab-btn.active { background: white; border-bottom: 3px solid #05c46b; color: #000; }
+        .tab-content { display: none; padding: 15px; }
         .tab-content.active { display: block; }
 
-        /* 테이블 스타일 */
-        table { width: 100%; border-collapse: collapse; background: white; min-width: 1000px; }
-        th, td { border: 1px solid #ddd; padding: 6px 8px; text-align: center; }
-        th { background: var(--header-bg); position: sticky; top: 0; }
+        table { width: 100%; border-collapse: collapse; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        th, td { border: 1px solid #ddd; padding: 8px 10px; text-align: center; }
+        th { background: var(--header-bg); position: sticky; top: 0; z-index: 10; }
         
-        .smp-league { background: #3F14F8; color: white; }
-        .highlight-bg { background-color: var(--highlight-bg); color: black; font-weight: bold; }
+        /* 배당 색상 패턴 */
+        .pattern-bg { background-color: var(--highlight-bg) !important; color: #000 !important; font-weight: bold; border: 1px solid #7fb3e0; border-radius: 2px; padding: 2px 4px; }
+        
+        .smp-league { background: #3F14F8 !important; color: white !important; font-weight: bold; }
         .win_color { color: var(--win-color); font-weight: bold; }
         .draw_color { color: var(--draw-color); font-weight: bold; }
         .loss_color { color: var(--loss-color); font-weight: bold; }
-        .strong { background: var(--strong-bg); color: white; font-weight: bold; padding: 2px 4px; }
-        .sub-detail { color: #0abde3; font-size: 0.9em; font-weight: bold; }
-        .find-focus { background-color: #fff200 !important; }
+        .strong { background: var(--strong-bg); color: white; font-weight: bold; border-radius: 3px; padding: 2px 5px; }
+        .sub-detail { color: #0abde3; font-size: 0.85em; font-weight: bold; margin-left: 5px; }
 
-        tr:hover { background-color: #f1f2f6; cursor: pointer; }
+        tr:hover { background-color: #f8f9fa; cursor: pointer; }
 
-        /* 모달 팝업 */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; }
-        .modal-content { background: white; width: 600px; margin: 100px auto; padding: 20px; border-radius: 8px; font-family: 'Consolas', monospace; position: relative; }
-        .modal-header { font-size: 1.2em; font-weight: bold; border-bottom: 1px solid #ddd; padding-bottom: 10px; margin-bottom: 15px; }
-        .close-btn { position: absolute; right: 20px; top: 20px; font-size: 20px; cursor: pointer; }
+        /* 모달 스타일 */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; }
+        .modal-content { background: #fdfdfd; width: 650px; margin: 80px auto; padding: 0; border-radius: 10px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .modal-header { background: #2f3640; color: white; padding: 15px 20px; font-size: 1.1em; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
+        .modal-body { padding: 20px; font-family: 'Consolas', 'Nanum Gothic Coding', monospace; white-space: pre-wrap; line-height: 1.7; color: #2c3e50; }
+        .close-btn { cursor: pointer; font-size: 24px; line-height: 1; }
+        .modal-footer { padding: 10px; background: #f1f2f6; text-align: center; }
     </style>
 </head>
 <body>
 
     <div class="top-frame">
-        <input type="file" id="fileInput" style="display:none" accept=".xlsx" />
-        <button class="btn-load" onclick="document.getElementById('fileInput').click()">1. 데이터 불러오기 및 분석</button>
-        <span class="lbl-debug" id="lblDebug">분석 대기 중 (v10.7 Web)</span>
+        <input type="file" id="fileInput" style="display:none" />
+        <button class="btn-load" onclick="document.getElementById('fileInput').click()">1. 엑셀 파일 분석 시작</button>
+        <span class="lbl-debug" id="lblDebug">분석 대기 중 (v10.7)</span>
     </div>
 
     <div class="tabs">
@@ -72,7 +72,7 @@
         <table id="tableMain">
             <thead>
                 <tr>
-                    <th>경기시간</th><th>리그</th><th>매치업(홈vs원정)</th><th>일반배당</th><th>핸디</th><th>핸디배당</th><th>v10.7 정밀 분석결과</th>
+                    <th>경기시간</th><th>리그</th><th>매치업(홈vs원정)</th><th>일반배당</th><th>핸디</th><th>핸디배당</th><th>분석결과</th>
                 </tr>
             </thead>
             <tbody></tbody>
@@ -83,7 +83,7 @@
         <table id="tableSmp">
             <thead>
                 <tr>
-                    <th>경기시간</th><th>리그</th><th>매치업(홈vs원정)</th><th>일반배당</th><th>핸디</th><th>핸디배당</th><th>v10.7 정밀 분석결과</th>
+                    <th>경기시간</th><th>리그</th><th>매치업(홈vs원정)</th><th>일반배당</th><th>핸디</th><th>핸디배당</th><th>분석결과</th>
                 </tr>
             </thead>
             <tbody></tbody>
@@ -101,13 +101,16 @@
         </table>
     </div>
 
-    <!-- 상세 분석 팝업 -->
     <div id="modal" class="modal">
         <div class="modal-content">
-            <span class="close-btn" onclick="closeModal()">&times;</span>
-            <div class="modal-header">🔍 v10.7 정밀 분석 보고서</div>
-            <div id="modalBody" style="white-space: pre-wrap; line-height: 1.6;"></div>
-            <button onclick="closeModal()" style="width:100%; margin-top:20px; padding:10px; cursor:pointer;">닫 기 (Close)</button>
+            <div class="modal-header">
+                <span>🔍 v10.7 정밀 분석 보고서</span>
+                <span class="close-btn" onclick="closeModal()">&times;</span>
+            </div>
+            <div id="modalBody" class="modal-body"></div>
+            <div class="modal-footer">
+                <button onclick="closeModal()" style="padding: 8px 30px; cursor:pointer;">닫기</button>
+            </div>
         </div>
     </div>
 
@@ -117,72 +120,103 @@
         let teamHistory = {};
         let h2hHistory = {};
         let cacheLvl1 = {}, cacheLvl2 = {}, cacheLvl3 = {};
+        let normalBgColor = null;
 
-        // 파일 읽기 이벤트
-        document.getElementById('fileInput').addEventListener('change', function(e) {
+        document.getElementById('fileInput').addEventListener('change', async function(e) {
             const file = e.target.files[0];
             if (!file) return;
 
+            document.getElementById('lblDebug').innerText = "색상 패턴 및 전적 분석 중...";
+            
             const reader = new FileReader();
-            reader.onload = function(e) {
-                const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, {type: 'array', cellStyles: true});
-                const sheetName = '일반핸디';
-                if (!workbook.SheetNames.includes(sheetName)) {
-                    alert('일반핸디 시트가 없습니다.');
+            reader.onload = async function(e) {
+                const arrayBuffer = e.target.result;
+                const workbook = new ExcelJS.Workbook();
+                await workbook.xlsx.load(arrayBuffer);
+                const ws = workbook.getWorksheet('일반핸디');
+                if (!ws) {
+                    alert("'일반핸디' 시트를 찾을 수 없습니다.");
                     return;
                 }
-                processExcel(workbook.Sheets[sheetName]);
+                processExcel(ws);
             };
             reader.readAsArrayBuffer(file);
         });
 
-        function processExcel(ws) {
-            const jsonData = XLSX.utils.sheet_to_json(ws, {header: 1});
-            const allData = [];
-            
-            // 데이터 추출 (파이썬 v10.6 로직 이식)
-            for (let i = 1; i < jsonData.length; i++) {
-                const row = jsonData[i];
-                if (!row[3]) continue; // 홈팀 없으면 스킵
+        // 셀 배경색 추출 (ExcelJS 전용)
+        function getCellColor(cell) {
+            if (cell && cell.fill && cell.fill.fgColor) {
+                // ARGB hex 값 반환
+                return cell.fill.fgColor.argb || "NO_FILL";
+            }
+            return "NO_FILL";
+        }
 
-                // 엑셀 라이브러리 특성상 색상 직접 추출은 유료 기능이 많으므로, 
-                // 원본 소스의 '색상 패턴'을 '배당값이 비어있지 않음' 정도로 간소화하거나 
-                // 특정 기준(예: 소수점 2자리)으로 패턴화합니다.
-                // 여기서는 원본 기능 유지를 위해 배당 패턴(G_Pat, H_Pat) 추출 로직을 시뮬레이션합니다.
-                
-                const g_odds = [
-                    {val: safeFormat(row[7]), colored: !!row[7]},
-                    {val: safeFormat(row[8]), colored: !!row[8]},
-                    {val: safeFormat(row[9]), colored: !!row[9]}
-                ];
-                const h_odds = [
-                    {val: safeFormat(row[15]), colored: !!row[15]},
-                    {val: safeFormat(row[16]), colored: !!row[16]},
-                    {val: safeFormat(row[17]), colored: !!row[17]}
-                ];
-
-                // 패턴 생성 (색상이 있는 항목의 인덱스 기준 - 여기선 단순화하여 값이 있는 것을 기준)
-                // 실제 원본 엑셀의 색상 조건이 있다면 이 부분을 수정해야 합니다.
-                let g_pat = [], h_pat = [];
-                if (row[7]) g_pat.push("승"); if (row[8]) g_pat.push("무"); if (row[9]) g_pat.push("패");
-                if (row[15]) h_pat.push("승"); if (row[16]) h_pat.push("무"); if (row[17]) h_pat.push("패");
-
-                allData.push({
-                    Time: String(row[1] || "").substring(5, 16),
-                    League: String(row[2] || "").trim(),
-                    Home: String(row[3] || "").trim(),
-                    Away: String(row[5] || "").trim(),
-                    Handi: String(row[14] || ""),
-                    G_Odds: g_odds,
-                    H_Odds: h_odds,
-                    G_Pat: g_pat.join(""),
-                    H_Pat: h_pat.join(""),
-                    Is_Smp: !!row[2], // 리그 칸에 색상이 있으면 승무패지만 웹에선 데이터 존재여부로 체크
-                    Gen_Res: cleanResult(row[10]),
-                    Han_Res: cleanResult(row[18])
+        // 파이썬의 learn_colors_smart 구현
+        function learnColorsSmart(ws) {
+            let colorCounts = {};
+            // 2행부터 200행까지 샘플링하여 가장 많이 사용된 배경색(기본색) 찾기
+            for (let i = 2; i <= Math.min(ws.rowCount, 200); i++) {
+                const row = ws.getRow(i);
+                [7, 8, 9, 15, 16, 17].forEach(idx => {
+                    const color = getCellColor(row.getCell(idx));
+                    colorCounts[color] = (colorCounts[color] || 0) + 1;
                 });
             }
+            let maxColor = "NO_FILL";
+            let maxCount = -1;
+            for (let color in colorCounts) {
+                if (colorCounts[color] > maxCount) {
+                    maxCount = colorCounts[color];
+                    maxColor = color;
+                }
+            }
+            return maxColor;
+        }
+
+        function processExcel(ws) {
+            normalBgColor = learnColorsSmart(ws);
+            const allData = [];
+
+            ws.eachRow((row, rowNumber) => {
+                if (rowNumber === 1) return; // 헤더 스킵
+                
+                const homeTeam = row.getCell(3).value;
+                if (!homeTeam) return;
+
+                const extractOdds = (colIndices, labels) => {
+                    let odds = [];
+                    let patterns = [];
+                    colIndices.forEach((idx, i) => {
+                        const cell = row.getCell(idx);
+                        const color = getCellColor(cell);
+                        const isColored = (color !== "NO_FILL" && color !== normalBgColor);
+                        const val = safeFormat(cell.value);
+                        odds.push({val, colored: isColored});
+                        if (isColored) patterns.push(labels[i]);
+                    });
+                    return {odds, patterns};
+                };
+
+                const gInfo = extractOdds([7, 8, 9], ["승", "무", "패"]);
+                const hInfo = extractOdds([15, 16, 17], ["승", "무", "패"]);
+                const leagueColor = getCellColor(row.getCell(2));
+
+                allData.push({
+                    Time: String(row.getCell(1).value || "").substring(5, 16),
+                    League: String(row.getCell(2).value || "").trim(),
+                    Home: String(homeTeam).trim(),
+                    Away: String(row.getCell(5).value || "").trim(),
+                    Handi: String(row.getCell(14).value || ""),
+                    G_Odds: gInfo.odds,
+                    H_Odds: hInfo.odds,
+                    G_Pat: gInfo.patterns.join(""),
+                    H_Pat: hInfo.patterns.join(""),
+                    Is_Smp: (leagueColor !== "NO_FILL" && leagueColor !== normalBgColor),
+                    Gen_Res: cleanResult(row.getCell(10).value),
+                    Han_Res: cleanResult(row.getCell(18).value)
+                });
+            });
 
             const pastData = allData.filter(d => d.Gen_Res !== "None");
             upcomingDataList = allData.filter(d => d.Gen_Res === "None");
@@ -194,6 +228,7 @@
             document.getElementById('lblDebug').innerText = `분석완료: 과거 ${pastData.length}건 / 예정 ${upcomingDataList.length}건`;
         }
 
+        // --- 분석 엔진 (파이썬 로직 동일 이식) ---
         function buildStatCache(pastData) {
             cacheLvl1 = {}; cacheLvl2 = {}; cacheLvl3 = {};
             teamHistory = {}; h2hHistory = {};
@@ -204,65 +239,53 @@
                 const k2 = `${r.League}_${r.G_Pat}`;
                 const k3 = `${r.G_Pat}_${r.H_Pat}`;
 
-                incCache(cacheLvl1, k1, resKey);
-                incCache(cacheLvl2, k2, resKey);
-                incCache(cacheLvl3, k3, resKey);
+                const inc = (obj, k, rk) => { if(!obj[k]) obj[k] = {}; obj[k][rk] = (obj[k][rk] || 0) + 1; };
+                inc(cacheLvl1, k1, resKey);
+                inc(cacheLvl2, k2, resKey);
+                inc(cacheLvl3, k3, resKey);
 
-                // 팀 기세
                 if(!teamHistory[r.Home]) teamHistory[r.Home] = [];
                 teamHistory[r.Home].push(r.Gen_Res);
-                
                 const aRes = (r.Gen_Res === '승' ? '패' : (r.Gen_Res === '패' ? '승' : '무'));
                 if(!teamHistory[r.Away]) teamHistory[r.Away] = [];
                 teamHistory[r.Away].push(aRes);
 
-                // 상대 전적
                 const h2hKey = [r.Home, r.Away].sort().join("|");
                 if(!h2hHistory[h2hKey]) h2hHistory[h2hKey] = [];
                 h2hHistory[h2hKey].push({h: r.Home, res: r.Gen_Res});
             });
         }
 
-        function incCache(obj, key, res) {
-            if(!obj[key]) obj[key] = {};
-            obj[key][res] = (obj[key][res] || 0) + 1;
-        }
-
         function getPrediction(row) {
+            if (!row.G_Pat && !row.H_Pat) return {text: "패턴없음", bestKey: "", prob: 0, prefix: ""};
+            
             let scores = {};
             let totalWeight = 0;
-
             const levels = [
-                {data: cacheLvl1, w: 10.0, k: `${row.League}_${row.Handi}_${row.G_Pat}`},
-                {data: cacheLvl2, w: 5.0, k: `${row.League}_${row.G_Pat}`},
-                {data: cacheLvl3, w: 2.0, k: `${row.G_Pat}_${row.H_Pat}`}
+                {data: cacheLvl1, w: 10, k: `${row.League}_${row.Handi}_${row.G_Pat}`},
+                {data: cacheLvl2, w: 5, k: `${row.League}_${row.G_Pat}`},
+                {data: cacheLvl3, w: 2, k: `${row.G_Pat}_${row.H_Pat}`}
             ];
 
             levels.forEach(lvl => {
                 const matches = lvl.data[lvl.k];
                 if (matches) {
-                    for (let resKey in matches) {
-                        const [gRes, hRes] = resKey.split("/");
-                        const count = matches[resKey];
-                        
-                        row.G_Pat.split("").forEach(p => {
-                            if(gRes === p) {
-                                const k = `일반[${p}]`;
-                                scores[k] = (scores[k] || 0) + (lvl.w * count);
-                            }
-                        });
-                        row.H_Pat.split("").forEach(p => {
-                            if(hRes === p) {
-                                const k = `핸디[${p}]`;
-                                scores[k] = (scores[k] || 0) + (lvl.w * count);
-                            }
-                        });
+                    for (let rk in matches) {
+                        const [gRes, hRes] = rk.split("/");
+                        const count = matches[rk];
+                        row.G_Pat.split("").forEach(p => { if(gRes === p) { const k=`일반[${p}]`; scores[k]=(scores[k]||0)+(lvl.w*count); } });
+                        row.H_Pat.split("").forEach(p => { if(hRes === p) { const k=`핸디[${p}]`; scores[k]=(scores[k]||0)+(lvl.w*count); } });
                         totalWeight += (lvl.w * count);
                     }
                 }
             });
 
-            if (Object.keys(scores).length === 0) return {text: "데이터 부족", bestKey: "", prob: 0, prefix: ""};
+            if (Object.keys(scores).length === 0) return {text: "사례없음", bestKey: "", prob: 0, prefix: ""};
+
+            let hMom = parseFloat(getMomentum(row.Home).score);
+            let aMom = parseFloat(getMomentum(row.Away).score);
+            if (hMom - aMom >= 3 && scores["일반[승]"]) scores["일반[승]"] *= 1.2;
+            if (aMom - hMom >= 3 && scores["일반[패]"]) scores["일반[패]"] *= 1.2;
 
             let sorted = Object.entries(scores).sort((a,b) => b[1] - a[1]);
             const [bestKey, bestScore] = sorted[0];
@@ -282,10 +305,7 @@
                 if (pred.bestKey) {
                     const key = `${row.League}_${row.G_Pat}_${row.H_Pat}`;
                     if (!scenarioStats[key]) scenarioStats[key] = {hits: 0, total: 0, results: [], best: pred.bestKey, prob: pred.prob};
-                    
-                    const isHit = (pred.bestKey.includes("일반") && pred.bestKey.includes(row.Gen_Res)) || 
-                                  (pred.bestKey.includes("핸디") && pred.bestKey.includes(row.Han_Res));
-                    
+                    const isHit = (pred.bestKey.includes(row.Gen_Res) || pred.bestKey.includes(row.Han_Res));
                     scenarioStats[key].total++;
                     if(isHit) scenarioStats[key].hits++;
                     if(scenarioStats[key].results.length < 5) scenarioStats[key].results.push(`${row.Gen_Res}/${row.Han_Res}`);
@@ -293,6 +313,7 @@
             });
         }
 
+        // --- UI 렌더링 ---
         function renderTables() {
             const tbodyMain = document.querySelector("#tableMain tbody");
             const tbodySmp = document.querySelector("#tableSmp tbody");
@@ -304,40 +325,39 @@
                 const tr = document.createElement("tr");
                 tr.onclick = () => showDetail(row, pred);
 
-                let gOddsHtml = row.G_Odds.map(o => `<span class="${o.colored?'highlight-bg':''}">${o.val}</span>`).join(" ");
-                let hOddsHtml = row.H_Odds.map(o => `<span class="${o.colored?'highlight-bg':''}">${o.val}</span>`).join(" ");
+                const renderOdds = (odds) => odds.map(o => `<span class="${o.colored?'pattern-bg':''}">${o.val}</span>`).join(" ");
                 
-                let resClass = pred.text.includes("승") ? "win_color" : (pred.text.includes("무") ? "draw_color" : "loss_color");
+                let resClass = pred.bestKey.includes("승") ? "win_color" : (pred.bestKey.includes("무") ? "draw_color" : "loss_color");
                 if (pred.prefix === "[강력]") resClass += " strong";
 
-                tr.innerHTML = `
+                const html = `
                     <td>${row.Time}</td>
                     <td class="${row.Is_Smp?'smp-league':''}">${row.League}</td>
-                    <td>${row.Home} vs ${row.Away}</td>
-                    <td>${gOddsHtml}</td>
-                    <td>${row.Handi}</td>
-                    <td>${hOddsHtml}</td>
+                    <td style="text-align:left;"><b>${row.Home}</b> vs ${row.Away}</td>
+                    <td>${renderOdds(row.G_Odds)}</td>
+                    <td style="color:#7f8c8d;">${row.Handi}</td>
+                    <td>${renderOdds(row.H_Odds)}</td>
                     <td class="${resClass}">${pred.text}</td>
                 `;
-
+                tr.innerHTML = html;
                 tbodyMain.appendChild(tr);
                 if(row.Is_Smp) tbodySmp.appendChild(tr.cloneNode(true));
             });
 
-            // 시나리오 탭
             Object.entries(scenarioStats)
                 .sort((a,b) => (b[1].hits/b[1].total) - (a[1].hits/a[1].total))
                 .forEach(([key, data]) => {
+                    if (data.total < 1) return;
                     const [league, gpat, hpat] = key.split("_");
                     const acc = ((data.hits / data.total) * 100).toFixed(1);
                     const tr = document.createElement("tr");
                     tr.innerHTML = `
                         <td>${league}</td>
-                        <td>G:${gpat}/H:${hpat}</td>
+                        <td style="font-size:0.9em; color:#7f8c8d;">G:${gpat || '-'} / H:${hpat || '-'}</td>
                         <td>${data.best}(${data.prob}%)</td>
                         <td>${data.hits}/${data.total}</td>
-                        <td style="color:red; font-weight:bold;">${acc}%</td>
-                        <td>[${data.results.join(",")}]</td>
+                        <td style="color:${acc>=70?'#e84118':'#2c3e50'}; font-weight:bold;">${acc}%</td>
+                        <td style="font-size:0.9em;">[${data.results.join(", ")}]</td>
                     `;
                     tbodySum.appendChild(tr);
                 });
@@ -349,20 +369,20 @@
             const h2h = getH2H(row.Home, row.Away);
 
             let content = `● 경기 : ${row.League} | ${row.Home} vs ${row.Away}\n`;
-            content += `● 패턴 : 일반 ${row.G_Pat} / 핸디 ${row.H_Pat} (H:${row.Handi})\n`;
-            content += "==========================================================\n";
+            content += `● 패턴 : 일반 [${row.G_Pat || '없음'}] / 핸디 [${row.H_Pat || '없음'}] (H:${row.Handi})\n`;
+            content += "=".repeat(60) + "\n";
             content += `▶ [홈 팀 최근전적] : ${hMom.recent.join("-") || '기록없음'} (기세 ${hMom.score}점)\n`;
             content += `▶ [원정팀 최근전적] : ${aMom.recent.join("-") || '기록없음'} (기세 ${aMom.score}점)\n`;
             content += `▶ [상대 전적(H2H)] : ${h2h.join("-") || '상대전적 없음'} (홈팀기준)\n`;
             content += "   (* 오른쪽일수록 최근 경기이며, 오늘 홈팀 기준의 결과입니다.)\n";
-            content += "----------------------------------------------------------\n";
+            content += "-".repeat(60) + "\n";
             content += `▶ [종합 분석 결과] : ${pred.text}\n`;
             
             const statKey = `${row.League}_${row.G_Pat}_${row.H_Pat}`;
             const stat = scenarioStats[statKey];
             if(stat) {
                 const acc = ((stat.hits / stat.total) * 100).toFixed(1);
-                content += `▶ [패턴 통계] : 적중률 ${acc}% (${stat.hits}/${stat.total} 회)\n`;
+                content += `▶ [패턴 통계] : 적중률 ${acc}% (${stat.hits}/${stat.total} 회 성공)\n`;
                 content += `▶ [최근 패턴 결과] : ${stat.results.join(", ")}\n`;
             }
 
@@ -390,7 +410,6 @@
             });
         }
 
-        // 유틸리티 함수들
         function cleanResult(val) {
             if (!val) return "None";
             const v = String(val).trim();
@@ -402,6 +421,7 @@
 
         function safeFormat(val) {
             if (val === undefined || val === null || val === "") return "";
+            if (typeof val === 'object' && val.result) val = val.result;
             return isNaN(val) ? val : parseFloat(val).toFixed(2);
         }
 
@@ -414,9 +434,8 @@
             evt.currentTarget.classList.add("active");
         }
 
-        function closeModal() {
-            document.getElementById('modal').style.display = 'none';
-        }
+        function closeModal() { document.getElementById('modal').style.display = 'none'; }
+        window.onclick = function(event) { if (event.target == document.getElementById('modal')) closeModal(); }
     </script>
 </body>
 </html>
