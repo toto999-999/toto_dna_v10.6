@@ -1,3 +1,5 @@
+--- START OF FILE TOTO_DNA_v10.6.html ---
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -81,7 +83,8 @@
     <!-- 메인 UI -->
     <div id="main-ui" style="display:none;">
         <div class="top-bar">
-            <input type="file" id="fileInput" style="display:none" />
+            <!-- accept=".xlsx" 속성 추가로 엑셀 파일만 선택 가능하도록 제한 -->
+            <input type="file" id="fileInput" style="display:none" accept=".xlsx" />
             <button class="btn-load" onclick="document.getElementById('fileInput').click()">1. 데이터 불러오기</button>
             <button class="btn-reset" onclick="clearFocus()">🔍 하이라이트 초기화</button>
             <span class="status" id="statusLbl">분석 대기 중...</span>
@@ -157,13 +160,17 @@
         document.getElementById('fileInput').addEventListener('change', async (e) => {
             const file = e.target.files[0];
             if (!file) return;
+
+            // 추가적인 파일 확장자 검증 (비정상적인 경로 차단용)
+            if (!file.name.toLowerCase().endsWith('.xlsx')) return;
+
             document.getElementById('statusLbl').innerText = "분석 중...";
             const wb = new ExcelJS.Workbook();
             const reader = new FileReader();
             reader.onload = async (f) => {
                 await wb.xlsx.load(f.target.result);
                 const ws = wb.getWorksheet('일반핸디');
-                parseExcel(ws);
+                if(ws) parseExcel(ws);
             };
             reader.readAsArrayBuffer(file);
         });
@@ -265,7 +272,6 @@
             let s = {}, totalW = 0;
             const lvls = [{d:cL1, w:10, k:`${r.league}_${r.handi}_${r.g_pat}`}, {d:cL2, w:5, k:`${r.league}_${r.handi?'':''}${r.league}_${r.g_pat}`}, {d:cL3, w:2, k:`${r.g_pat}_${r.h_pat}`}];
             
-            // 중첩 루프 최적화
             [cL1[`${r.league}_${r.handi}_${r.g_pat}`], cL2[`${r.league}_${r.g_pat}`], cL3[`${r.g_pat}_${r.h_pat}`]].forEach((lvlData, i) => {
                 if(!lvlData) return;
                 const weight = [10, 5, 2][i];
@@ -286,7 +292,6 @@
             const [best, val] = sorted[0];
             const prob = ((val / Object.values(s).reduce((a,b)=>a+b)) * 100).toFixed(1);
             
-            // 핸디 세부 분석
             let sub = "";
             let subScores = {};
             [cL1[`${r.league}_${r.handi}_${r.g_pat}`], cL2[`${r.league}_${r.g_pat}`], cL3[`${r.g_pat}_${r.h_pat}`]].forEach((lvlData, i) => {
@@ -436,3 +441,5 @@
     </script>
 </body>
 </html>
+
+--- END OF FILE ---
