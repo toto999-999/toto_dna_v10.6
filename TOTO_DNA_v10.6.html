@@ -14,28 +14,28 @@
             --highlight: #9BC2E6;
             --focus-yellow: #fff200;
         }
-        body { font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; margin: 0; background: #f1f2f6; font-size: 13.5px; }
+        body { font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; margin: 0; background: #f1f2f6; font-size: 13.5px; overflow-x: hidden; }
         
-        /* 2. 비밀번호 화면 크기 개선 (모바일 최적화) */
-        #login-screen { position: fixed; top:0; left:0; width:100%; height:100%; background: #2f3640; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; text-align: center; }
-        #login-screen h2 { font-size: 24px; margin-bottom: 20px; }
-        .pw-input { padding: 15px; font-size: 24px; text-align: center; border-radius: 8px; border: none; margin-top: 10px; width: 80%; max-width: 300px; letter-spacing: 5px; }
-        .btn-login { margin-top: 30px; padding: 15px 60px; font-size: 18px; cursor:pointer; font-weight:bold; background: #05c46b; color: white; border: none; border-radius: 8px; width: 80%; max-width: 300px; }
+        /* 로그인 화면 (모바일 대응 크게) */
+        #login-screen { position: fixed; top:0; left:0; width:100%; height:100%; background: #2f3640; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; }
+        #login-screen h2 { font-size: 28px; margin-bottom: 20px; color: #05c46b; }
+        .pw-input { padding: 18px; font-size: 28px; text-align: center; border-radius: 10px; border: none; margin-top: 10px; width: 220px; letter-spacing: 10px; }
+        .btn-login { margin-top: 30px; padding: 15px 70px; font-size: 20px; cursor:pointer; font-weight:bold; background: #05c46b; color: white; border: none; border-radius: 10px; }
         
-        /* 3. 상단 버튼 사이즈 확대 */
-        .top-bar { background: var(--bg-dark); color: white; padding: 12px 20px; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 100; flex-wrap: wrap; }
-        .btn-load { background: #05c46b; color: white; border: none; padding: 10px 25px; font-weight: bold; cursor: pointer; border-radius: 4px; min-width: 160px; font-size: 14px; }
-        .btn-reset { background: #f39c12; color: white; border: none; padding: 10px 25px; font-weight: bold; cursor: pointer; border-radius: 4px; min-width: 160px; font-size: 14px; }
-        .status { color: #f1c40f; font-weight: bold; font-size: 13px; margin-left: 5px; }
+        /* 상단 바 및 버튼 */
+        .top-bar { background: var(--bg-dark); color: white; padding: 12px 20px; display: flex; align-items: center; gap: 15px; position: sticky; top: 0; z-index: 100; }
+        .btn-load { background: #05c46b; color: white; border: none; padding: 10px 30px; font-weight: bold; cursor: pointer; border-radius: 4px; min-width: 180px; font-size: 14px; }
+        .btn-reset { background: #f39c12; color: white; border: none; padding: 10px 30px; font-weight: bold; cursor: pointer; border-radius: 4px; min-width: 180px; font-size: 14px; }
+        .status { color: #f1c40f; font-weight: bold; font-size: 13px; }
         
-        /* 탭 시스템 */
+        /* 탭 스타일 */
         .tabs { display: flex; background: #dfe4ea; border-bottom: 1px solid #ccc; padding: 0 10px; position: sticky; top: 58px; z-index: 90; }
-        .tab-btn { padding: 12px 20px; border: none; cursor: pointer; background: none; font-weight: bold; color: #57606f; font-size: 14px; }
+        .tab-btn { padding: 12px 22px; border: none; cursor: pointer; background: none; font-weight: bold; color: #57606f; font-size: 14px; }
         .tab-btn.active { background: white; border-bottom: 4px solid #05c46b; color: black; }
         .tab-content { display: none; padding: 8px; }
         .tab-content.active { display: block; }
 
-        /* 테이블 */
+        /* 테이블 공통 */
         table { width: 100%; border-collapse: collapse; background: white; table-layout: fixed; border: 1px solid #999; }
         th, td { border: 1px solid #ced4da; padding: 8px 4px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         th { background: #dcdde1; font-weight: bold; color: #2f3640; position: sticky; top: 0; z-index: 10; font-size: 13px; }
@@ -47,41 +47,40 @@
         .col-handi { width: 35px; } 
         .col-result { width: 300px; }
 
+        /* 강조 색상 */
         .pattern-fill { background-color: var(--highlight) !important; color: black !important; font-weight: bold; }
         .smp-mark { background: #3F14F8 !important; color: white !important; font-weight: bold; }
         .win { color: var(--win-blue); font-weight: bold; }
         .draw { color: var(--draw-green); font-weight: bold; }
         .loss { color: var(--loss-red); font-weight: bold; }
         
-        .res-text { font-weight: bold; }
-        .strong-text { text-decoration: underline; }
-        .sub-prob { color: #0abde3; font-size: 11.5px; margin-left: 3px; font-weight: bold; }
-
-        .find-focus { background-color: var(--focus-yellow) !important; color: black !important; font-weight: bold; }
+        .find-focus { background-color: var(--focus-yellow) !important; color: black !important; font-weight: bold; border: 2px solid #000 !important; }
         tr:hover { background-color: #f1f2f6; cursor: pointer; }
 
+        /* 모달 리포트 */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; }
-        .modal-box { background: #fdfdfd; width: 90%; max-width: 630px; margin: 40px auto; border-radius: 10px; overflow: hidden; }
+        .modal-box { background: #fdfdfd; width: 95%; max-width: 630px; margin: 30px auto; border-radius: 10px; overflow: hidden; }
         .modal-header { background: #1e272e; color: white; padding: 15px 20px; font-weight: bold; display: flex; justify-content: space-between; }
-        .modal-body { padding: 20px; font-family: 'Consolas', monospace; white-space: pre-wrap; line-height: 1.7; font-size: 14px; color: #2c3e50; }
-        .close-btn { cursor: pointer; }
+        .modal-body { padding: 20px; font-family: 'Consolas', monospace; white-space: pre-wrap; line-height: 1.6; font-size: 14px; color: #2c3e50; }
+        .close-btn { cursor: pointer; font-size: 20px; }
     </style>
 </head>
 <body>
 
+    <!-- 비밀번호 인증 -->
     <div id="login-screen">
         <h2>TOTO_DNA ACCESS</h2>
-        <p>비밀번호를 입력하세요</p>
         <input type="password" id="pwField" class="pw-input" maxlength="4" placeholder="••••">
-        <button onclick="checkPw()" class="btn-login">접속하기</button>
+        <button onclick="checkPw()" class="btn-login">시스템 접속</button>
     </div>
 
+    <!-- 메인 UI -->
     <div id="main-ui" style="display:none;">
         <div class="top-bar">
             <input type="file" id="fileInput" style="display:none" accept=".xlsx" />
             <button class="btn-load" onclick="document.getElementById('fileInput').click()">1. 데이터 불러오기</button>
             <button class="btn-reset" onclick="clearFocus()">🔍 하이라이트 초기화</button>
-            <span class="status" id="statusLbl">분석 대기 중...</span>
+            <span class="status" id="statusLbl">준비됨</span>
         </div>
 
         <div class="tabs">
@@ -109,7 +108,7 @@
                     <tr>
                         <th class="col-time">시간</th><th class="col-league">리그</th><th class="col-match">매치업</th>
                         <th class="col-odds">일반배당</th><th class="col-handi">H</th><th class="col-odds">핸디배당</th>
-                        <th class="col-result">승무패 패턴 분석</th>
+                        <th class="col-result">승무패 분석</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
@@ -129,10 +128,11 @@
         </div>
     </div>
 
+    <!-- 모달 -->
     <div id="modal" class="modal" onclick="closeModal()">
         <div class="modal-box" onclick="event.stopPropagation()">
             <div class="modal-header">
-                <span>🔍 v10.6 정밀 리포트</span>
+                <span>🔍 정밀 분석 리포트</span>
                 <span class="close-btn" onclick="closeModal()">&times;</span>
             </div>
             <div id="modalBody" class="modal-body"></div>
@@ -150,9 +150,18 @@
 
         let upData = [], scStats = {}, tHist = {}, h2hHist = {}, cL1 = {}, cL2 = {}, cL3 = {}, baseColor = "NO_FILL";
 
+        // 1. 유일한 시나리오 ID 생성 (정확한 매칭을 위해 구분자 사용)
+        function getScenId(league, gPat, hPat) {
+            const cleanL = String(league || "").trim();
+            const cleanG = String(gPat || "X").trim();
+            const cleanH = String(hPat || "X").trim();
+            // 리그와 패턴을 파이프로 결합하여 '프리그1|승|패' 형태의 유니크 키 생성
+            return btoa(unescape(encodeURIComponent(`${cleanL}|${cleanG}|${cleanH}`))).substring(0, 16);
+        }
+
         document.getElementById('fileInput').addEventListener('change', async (e) => {
             const file = e.target.files[0];
-            if (!file || !file.name.toLowerCase().endsWith('.xlsx')) return;
+            if (!file) return;
             document.getElementById('statusLbl').innerText = "분석 중...";
             const wb = new ExcelJS.Workbook();
             const reader = new FileReader();
@@ -163,14 +172,6 @@
             };
             reader.readAsArrayBuffer(file);
         });
-
-        // 1. 패턴 아이디 생성 로직 강화 (공백 제거 등)
-        function getScenId(league, gPat, hPat) {
-            const l = String(league || "").trim();
-            const g = String(gPat || "").trim();
-            const h = String(hPat || "").trim();
-            return btoa(unescape(encodeURIComponent(`${l}_${g}_${h}`))).substring(0, 12);
-        }
 
         function getHexColor(cell) {
             if (!cell || !cell.fill || !cell.fill.fgColor) return "NO_FILL";
@@ -232,7 +233,7 @@
             buildCache(past);
             calcStats(past);
             render();
-            document.getElementById('statusLbl').innerText = `분석완료 (예정: ${upData.length}건)`;
+            document.getElementById('statusLbl').innerText = `분석완료 (${upData.length}경기)`;
         }
 
         function clean(v) {
@@ -250,11 +251,9 @@
                 const k1 = `${r.league}_${r.handi}_${r.g_pat}`, k2 = `${r.league}_${r.g_pat}`, k3 = `${r.g_pat}_${r.h_pat}`;
                 const add = (obj, k) => { if(!obj[k]) obj[k] = {}; obj[k][res] = (obj[k][res]||0)+1; };
                 add(cL1, k1); add(cL2, k2); add(cL3, k3);
-
                 if(!tHist[r.home]) tHist[r.home] = []; tHist[r.home].push(r.res_g);
                 const aR = r.res_g==='승'?'패':(r.res_g==='패'?'승':'무');
                 if(!tHist[r.away]) tHist[r.away] = []; tHist[r.away].push(aR);
-
                 const h2k = [r.home, r.away].sort().join("|");
                 if(!h2hHist[h2k]) h2hHist[h2k] = []; h2hHist[h2k].push({h:r.home, r:r.res_g});
             });
@@ -263,8 +262,8 @@
         function getPred(r) {
             if(!r.g_pat && !r.h_pat) return {txt: "패턴없음", best:"", prob:0};
             let s = {}, totalW = 0;
-            
-            [cL1[`${r.league}_${r.handi}_${r.g_pat}`], cL2[`${r.league}_${r.g_pat}`], cL3[`${r.g_pat}_${r.h_pat}`]].forEach((lvlData, i) => {
+            const lvls = [cL1[`${r.league}_${r.handi}_${r.g_pat}`], cL2[`${r.league}_${r.g_pat}`], cL3[`${r.g_pat}_${r.h_pat}`]];
+            lvls.forEach((lvlData, i) => {
                 if(!lvlData) return;
                 const weight = [10, 5, 2][i];
                 for(let rk in lvlData) {
@@ -274,34 +273,11 @@
                     totalW += (weight * cnt);
                 }
             });
-
             if(Object.keys(s).length === 0) return {txt: "사례부족", best:"", prob:0};
-            const hM = parseFloat(getMom(r.home).s), aM = parseFloat(getMom(r.away).s);
-            if(hM - aM >= 3 && s["일반[승]"]) s["일반[승]"] *= 1.2;
-            if(aM - hM >= 3 && s["일반[패]"]) s["일반[패]"] *= 1.2;
-
             const sorted = Object.entries(s).sort((a,b)=>b[1]-a[1]);
             const [best, val] = sorted[0];
             const prob = ((val / Object.values(s).reduce((a,b)=>a+b)) * 100).toFixed(1);
-            
-            let sub = "";
-            let subScores = {};
-            [cL1[`${r.league}_${r.handi}_${r.g_pat}`], cL2[`${r.league}_${r.g_pat}`], cL3[`${r.g_pat}_${r.h_pat}`]].forEach((lvlData, i) => {
-                if(!lvlData) return;
-                const weight = [10, 5, 2][i];
-                for(let rk in lvlData) {
-                    const [rg, rh] = rk.split("/");
-                    if(best.includes("일반") && best.includes(rg)) subScores[rh] = (subScores[rh]||0) + (weight * lvlData[rk]);
-                    if(best.includes("핸디") && best.includes(rh)) subScores[rg] = (subScores[rg]||0) + (weight * lvlData[rk]);
-                }
-            });
-            if(Object.keys(subScores).length > 0) {
-                const subTot = Object.values(subScores).reduce((a,b)=>a+b);
-                const subSorted = Object.entries(subScores).sort((a,b)=>b[1]-a[1]);
-                sub = " → " + subSorted.map(e => `${best.includes("일반")?"H":""}${e[0]}(${((e[1]/subTot)*100).toFixed(0)}%)`).join(", ");
-            }
-
-            return {txt: `${totalW > 40 ? '[강력] ' : ''}${best} (${prob}%)${sub}`, best, prob, isStrong: totalW > 40, subStr: sub};
+            return {txt: `${totalW > 40 ? '[강력] ' : ''}${best} (${prob}%)`, best, prob, isStrong: totalW > 40};
         }
 
         function getMom(t) {
@@ -316,7 +292,7 @@
                 const p = getPred(r);
                 if(p.best){
                     const k = getScenId(r.league, r.g_pat, r.h_pat);
-                    if(!scStats[k]) scStats[k] = {league: r.league, gp: r.g_pat, hp: r.h_pat, hits:0, total:0, res:[], best:p.best, prob:p.prob};
+                    if(!scStats[k]) scStats[k] = {league: r.league, gp: r.g_pat, hp: r.h_pat, hits:0, total:0, res:[], best:p.best};
                     if(p.best.includes(r.res_g) || p.best.includes(r.res_h)) scStats[k].hits++;
                     scStats[k].total++;
                     if(scStats[k].res.length < 5) scStats[k].res.push(`${r.res_g}/${r.res_h}`);
@@ -328,25 +304,31 @@
             document.querySelectorAll('.find-focus').forEach(el => el.classList.remove('find-focus'));
         }
 
+        // 경기 -> 패턴 통계로 이동 및 강조
         function focusScenario(sid) {
-            clearFocus();
-            // 통계 탭에서 해당 패턴 찾기
             const target = document.getElementById(`scen_${sid}`);
             if(target) {
+                // 강조 전 초기화
+                clearFocus();
                 target.classList.add('find-focus');
+                // 통계 탭으로 전환하지 않고 위치만 기억 (유저가 탭3 클릭 시 바로 보이게)
+                // 만약 즉시 이동하고 싶다면 아래 주석 해제
+                // tabCtrl(null, 'tab3', document.getElementById('btnTab3'));
+                target.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
         }
 
-        // 4. 패턴 통계에서 클릭 시 일반/승무패 경기 모두 강조
+        // 패턴 통계 -> 해당되는 모든 경기 강조
         function focusMatches(sid) {
             clearFocus();
-            // 일반 경기 탭으로 우선 이동하지만, 실제 강조는 모든 탭의 해당 클래스에 적용
             tabCtrl(null, 'tab1', document.getElementById('btnTab1'));
             setTimeout(() => {
                 const targets = document.querySelectorAll(`.m-row-${sid}`);
                 if(targets.length > 0) {
                     targets[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
                     targets.forEach(t => t.classList.add('find-focus'));
+                } else {
+                    alert("현재 예정된 경기 중 해당 패턴의 경기가 없습니다.");
                 }
             }, 100);
         }
@@ -364,11 +346,12 @@
                 const createRow = () => {
                     const tr = document.createElement("tr");
                     tr.className = `m-row-${sid}`;
-                    tr.onclick = () => { showDetail(r, p); focusScenario(sid); };
-
+                    tr.onclick = (e) => { 
+                        showDetail(r, p); 
+                        focusScenario(sid); 
+                    };
                     const oddsHtml = (odds) => odds.map(o => `<span class="${o.p?'pattern-fill':''}">${o.v}</span>`).join(" ");
                     const resClass = p.best.includes("승")?"win":(p.best.includes("무")?"draw":"loss");
-                    
                     tr.innerHTML = `
                         <td>${r.time}</td>
                         <td class="${r.is_smp?'smp-mark':''}">${r.league}</td>
@@ -376,60 +359,51 @@
                         <td>${oddsHtml(r.g_odds)}</td>
                         <td style="color:#888">${r.handi}</td>
                         <td>${oddsHtml(r.h_odds)}</td>
-                        <td>
-                            <span class="res-text ${resClass} ${p.isStrong?'strong-text':''}">${p.txt.split(' → ')[0]}</span>
-                            <span class="sub-prob">${p.subStr}</span>
-                        </td>
+                        <td class="res-text ${resClass}">${p.txt}</td>
                     `;
                     return tr;
                 };
 
-                const tr1 = createRow();
-                b1.appendChild(tr1);
-
-                // 4. 승무패 경기 테이블 전용 행 생성 (상호작용 포함)
-                if(r.is_smp) {
-                    const tr2 = createRow();
-                    b2.appendChild(tr2);
-                }
+                b1.appendChild(createRow());
+                if(r.is_smp) b2.appendChild(createRow());
             });
 
-            Object.entries(scStats).sort((a,b)=>(b[1].hits/b[1].total)-(a[1].hits/a[1].total)).forEach(([sid, d])=>{
-                const acc = ((d.hits/d.total)*100).toFixed(1);
-                const tr = document.createElement("tr");
-                tr.id = `scen_${sid}`;
-                tr.onclick = () => focusMatches(sid);
-                const resClass = d.best.includes('승')?'win':(d.best.includes('무')?'draw':'loss');
-                tr.innerHTML = `
-                    <td>${d.league}</td>
-                    <td style="color:#7f8c8d; font-size:12px;">G:${d.gp || '-'} / H:${d.hp || '-'}</td>
-                    <td class="${resClass}">${d.best}</td>
-                    <td>${d.hits}/${d.total}</td>
-                    <td style="color:#e74c3c; font-weight:bold;">${acc}%</td>
-                    <td style="font-size:12px;">${d.res.join(" | ")}</td>
-                `;
-                b3.appendChild(tr);
-            });
+            // 통계 테이블 렌더링
+            Object.entries(scStats)
+                .sort((a,b)=>(b[1].hits/b[1].total)-(a[1].hits/a[1].total))
+                .forEach(([sid, d])=>{
+                    const acc = ((d.hits/d.total)*100).toFixed(1);
+                    const tr = document.createElement("tr");
+                    tr.id = `scen_${sid}`;
+                    tr.onclick = () => focusMatches(sid);
+                    const resClass = d.best.includes('승')?'win':(d.best.includes('무')?'draw':'loss');
+                    tr.innerHTML = `
+                        <td>${d.league}</td>
+                        <td style="color:#7f8c8d; font-size:12px;">G:${d.gp || '-'} / H:${d.hp || '-'}</td>
+                        <td class="${resClass}">${d.best}</td>
+                        <td>${d.hits}/${d.total}</td>
+                        <td style="color:#e74c3c; font-weight:bold;">${acc}%</td>
+                        <td style="font-size:12px;">${d.res.join(" | ")}</td>
+                    `;
+                    b3.appendChild(tr);
+                });
         }
 
         function showDetail(r, p) {
             const hM = getMom(r.home), aM = getMom(r.away);
             const h2h = (h2hHist[[r.home,r.away].sort().join("|")] || []).slice(-5).map(m => m.h===r.home?m.r:(m.r==='승'?'패':(m.r==='패'?'승':'무')));
-            const sid = getScenId(r.league, r.g_pat, r.h_pat);
-            const st = scStats[sid];
+            const st = scStats[getScenId(r.league, r.g_pat, r.h_pat)];
 
-            let c = `● 경기 : [${r.league}] ${r.home} vs ${r.away}\n`;
-            c += `● 패턴 : 일반(${r.g_pat || '없음'}) / 핸디(${r.h_pat || '없음'}) / H:${r.handi}\n`;
-            c += `----------------------------------------------------------\n`;
-            c += `▶ 홈 팀 최근 : ${hM.h.join("-") || '기록없음'} (기세 ${hM.s}점)\n`;
-            c += `▶ 원정팀 최근 : ${aM.h.join("-") || '기록없음'} (기세 ${aM.s}점)\n`;
-            c += `▶ 상대 전적  : ${h2h.join("-") || '기록없음'} (최근5경기, 홈기준)\n`;
-            c += `----------------------------------------------------------\n`;
-            c += `▶ 종합 분석  : ${p.txt}\n`;
-            if(st) {
-                c += `▶ 패턴 적중률: ${((st.hits/st.total)*100).toFixed(1)}% (${st.hits}/${st.total}회 성공)\n`;
-                c += `▶ 최근 패턴 사례 (일반/핸디):\n   [ ${st.res.join(" ], [ ")} ]`;
-            }
+            let c = `● [${r.league}] ${r.home} vs ${r.away}\n`;
+            c += `● 패턴: 일반(${r.g_pat || '없음'}) / 핸디(${r.h_pat || '없음'})\n`;
+            c += `--------------------------------------------------\n`;
+            c += `▶ 홈팀 최근: ${hM.h.join("-")} (기세 ${hM.s})\n`;
+            c += `▶ 원정 최근: ${aM.h.join("-")} (기세 ${aM.s})\n`;
+            c += `▶ 상대 전적: ${h2h.join("-") || '기록없음'}\n`;
+            c += `--------------------------------------------------\n`;
+            c += `▶ 분석 결과: ${p.txt}\n`;
+            if(st) c += `▶ 패턴 성적: ${((st.hits/st.total)*100).toFixed(1)}% (${st.hits}/${st.total})\n`;
+            
             document.getElementById('modalBody').innerText = c;
             document.getElementById('modal').style.display = 'block';
         }
